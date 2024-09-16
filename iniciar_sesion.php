@@ -1,30 +1,39 @@
 <?php
-include 'config.php'; // Incluir la configuración de conexión
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "usuarios";
 
-// Verificar si se envió el formulario
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo = $_POST['correo'];
     $contraseña = $_POST['contraseña'];
 
-    // Buscar el usuario en la base de datos usando consulta preparada
     $stmt = $conn->prepare("SELECT * FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $correo);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Verificar la contraseña
-        $row = $result->fetch_assoc();
-        if (password_verify($contraseña, $row['contraseña'])) {
-            echo "Inicio de sesión exitoso. ¡Bienvenido " . $row['nombre'] . "!";
+        $user = $result->fetch_assoc();
+        if (password_verify($contraseña, $user['contraseña'])) {
+            echo json_encode(['success' => true, 'nombre' => $user['nombre']]);
         } else {
-            echo "Contraseña incorrecta.";
+            echo json_encode(['success' => false, 'message' => "Contraseña incorrecta."]);
         }
     } else {
-        echo "No se encontró una cuenta con ese correo.";
+        echo json_encode(['success' => false, 'message' => "El correo no está registrado."]);
     }
 
     $stmt->close();
 }
+
 $conn->close();
 ?>
+
+

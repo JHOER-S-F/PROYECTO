@@ -15,12 +15,20 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            mostrarResultado('Reserva confirmada.');
+            mostrarResultado('RESERVA CONFIRMADA <br>'+ '<br>'+ fecha+'<br>'+hora+'<br>'+cancha);
+
+            // Redirigir al index.html después de 3 segundos si la reserva es exitosa
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 3000);
         } else {
             mostrarResultado('Error: ' + data.message);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarResultado('Error al procesar la reserva.');
+    });
 });
 
 function mostrarResultado(mensaje) {
