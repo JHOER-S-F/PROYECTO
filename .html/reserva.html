@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas de Canchas de Fútbol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="recerva.css">
+    <script src="recerva.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            RESERVAR CANCHA DE FÚTBIL
+        </h1>
+        <form id="reservaForm">
+            <label for="fecha">FECHA</label>
+            <input type="date" id="fecha" name="fecha" required>
+            
+            <label for="hora">HORA</label>
+            <input type="time" id="hora" name="hora" required>
+
+            <label for="cancha"></label>
+            <select id="cancha" name="cancha" aria-placeholder="CANCHA" required>
+                <option value="1">CANCHA 1</option>
+                <option value="2">CANCHA 2</option>
+                <option value="3">CANCHA 3</option>
+            </select>
+
+            <button type="submit">RESERVAR</button>
+        </form>
+
+        <div id="resultado"></div>
+    </div>
+</body>
+</html>
