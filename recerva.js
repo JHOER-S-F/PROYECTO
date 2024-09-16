@@ -1,12 +1,10 @@
 document.getElementById('reservaForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // Obtener los valores del formulario
     const fecha = document.getElementById('fecha').value;
     const hora = document.getElementById('hora').value;
     const cancha = document.getElementById('cancha').value;
 
-    // Enviar datos al archivo PHP usando fetch
     fetch('procesar_reserva.php', {
         method: 'POST',
         headers: {
@@ -25,7 +23,6 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     .catch(error => console.error('Error:', error));
 });
 
-// Función para mostrar el resultado de la reserva
 function mostrarResultado(mensaje) {
     const resultadoDiv = document.getElementById('resultado');
     resultadoDiv.textContent = mensaje;

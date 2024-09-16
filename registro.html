@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js " defer></script>
+    <link rel="stylesheet" href="registro.css">
+    <script src="registro.js " defer></script>
 </head>
 <body>
     <main>
@@ -22,18 +22,18 @@
             </div>
         </div>
         <div class="caja_registros">
-            <form action="" class="inicio">
+            <form action="iniciar_sesion.php" method="POST" class="inicio">
                 <h2>INICIAR SESIÓN</h2>
-                <input type="email" placeholder="CORREO ELECTRONICO">
-                <input type="password" placeholder="CONTRASEÑA">
-                <input type="button" value="INICIAR SESIÓN">
+                <input type="email" name="correo" placeholder="CORREO ELECTRONICO" required>
+                <input type="password" name="contraseña" placeholder="CONTRASEÑA" required>
+                <input type="submit" value="INICIAR SESIÓN">
             </form>
-            <form action="" class="registro">
+            <form action="registro.php" method="POST" class="registro">
                 <h2>REGISTRARSE</h2>
-                <input type="text" placeholder="NOMBRE">
-                <input type="email" placeholder="CORREO ELECTRONICO">
-                <input type="password" placeholder="CONTRASEÑA">
-                <input type="button" value="REGISTRARSE">
+                <input type="text" name="nombre" placeholder="NOMBRE" required>
+                <input type="email" name="correo" placeholder="CORREO ELECTRONICO" required>
+                <input type="password" name="contraseña" placeholder="CONTRASEÑA" required>
+                <input type="submit" value="REGISTRARSE">
             </form>
         </div>
     </div>
