@@ -15,7 +15,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            mostrarResultado('RESERVA CONFIRMADA <br>'+ '<br>'+ fecha+'<br>'+hora+'<br>'+cancha);
+            mostrarResultado('RESERVA CONFIRMADA '+ fecha+'<br>'+hora+'<br>'+cancha);
 
             // Redirigir al index.html después de 3 segundos si la reserva es exitosa
             setTimeout(() => {
