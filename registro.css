@@ -1,32 +1,33 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     text-decoration: none;
 }
 
-body{
-    background-image: url(/IMAGES/VETERINARIA\ 3.jpg);
+body {
+    background-image: url(/IMAGES/VETERINARIA\ 3.jpg); /* Asegúrate de que la ruta sea correcta */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     background-attachment: fixed;
     font-family: "Dancing Script", cursive;
 }
-main{
+
+main {
     width: 100%;
     padding: 20px;
     margin-top: 100px;
 }
 
-.todo{
+.todo {
     width: 100%;
     max-width: 800px;
     margin: auto;
     position: relative;
 }
 
-.caja_inicio{
+.caja_inicio {
     width: 100%;
     padding: 10px 20px;
     display: flex;
@@ -34,17 +35,19 @@ main{
     backdrop-filter: blur(10px);
     background-color: rgba(99, 151, 131, 0.5);
 }
-.caja_inicio div{
+
+.caja_inicio div {
     margin: 100px 40px;
     color: #fff;
     transition: all 500ms;
 }
-.caja_inicio div h2{
+
+.caja_inicio div h2 {
     font-weight: 400;
     font-size: 30px;
 }
 
-.caja_inicio div input{
+.caja_inicio div input {
     padding: 10px 40px;
     border: 2px solid #fff;
     background: transparent;
@@ -57,12 +60,12 @@ main{
     border-radius: 10px 5px;
 }
 
-.caja_inicio div input:hover{
+.caja_inicio div input:hover {
     backdrop-filter: blur(10px);
     background-color: rgba(241, 207, 190, 0.5);
 }
 
-.caja_registros{
+.caja_registros {
     display: flex;
     align-items: center;
     width: 100%;
@@ -73,15 +76,15 @@ main{
     transition: left 500ms cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
-
-.caja_registros form{
+.caja_registros form {
     width: 100%;
     padding: 80px 20px;
     background: #fff;
     position: absolute;
     border-radius: 20px;
 }
-.caja_registros form input{
+
+.caja_registros form input {
     width: 100%;
     margin-top: 20px;
     padding: 10px;
@@ -90,7 +93,8 @@ main{
     font-size: 16px;
     outline: none;
 }
-.caja_registros form input[type="button"]{
+
+.caja_registros form input[type="button"] {
     padding: 10px 40px;
     margin-top: 40px;
     border: none;
@@ -100,45 +104,44 @@ main{
     cursor: pointer;
     outline: none;
 }
-.caja_registros .inisio{
+
+.caja_registros .inicio {
     opacity: 1;
     display: block;
 }
-.caja_registros .registro{
+
+.caja_registros .registro {
     display: none;
 }
 
-
-
-
-@media screen and (max-width:850px){
-    .todo{
-        margin-top:50px ;
+@media screen and (max-width: 850px) {
+    .todo {
+        margin-top: 50px;
     }
-    .caja_inicio{
+
+    .caja_inicio {
         max-width: 350px;
         height: 300px;
         flex-direction: column;
         margin: auto;
     }
-    .caja_inicio div{
-        margin: 0px;
+
+    .caja_inicio div {
+        margin: 0;
         position: absolute;
     }
 
-    .caja_registros{
+    .caja_registros {
         top: -10px;
         left: 10px;
         margin: auto;
     }
 
-    .caja_registros form{
+    .caja_registros form {
         position: relative;
     }
+}
 
-
-    
-    }
 
 
 

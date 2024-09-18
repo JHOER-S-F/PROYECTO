@@ -17,7 +17,6 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         if (data.success) {
             mostrarResultado('RESERVA CONFIRMADA '+ fecha+'<br>'+hora+'<br>'+cancha);
 
-            // Redirigir al index.html después de 3 segundos si la reserva es exitosa
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 3000);

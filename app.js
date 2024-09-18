@@ -1,6 +1,6 @@
 let db;
 
-// Inicializar IndexedDB
+
 window.onload = function () {
     let request = window.indexedDB.open('miBaseDatos', 1);
 
@@ -22,7 +22,7 @@ window.onload = function () {
     };
 };
 
-// Función para hashear la contraseña usando SHA-256
+
 async function hashPassword(password) {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
@@ -30,7 +30,7 @@ async function hashPassword(password) {
     return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Función para guardar datos en IndexedDB
+
 function guardarEnIndexedDB(datos) {
     let transaction = db.transaction(['usuarios'], 'readwrite');
     let objectStore = transaction.objectStore('usuarios');
@@ -47,7 +47,6 @@ function guardarEnIndexedDB(datos) {
     };
 }
 
-// Función para enviar datos al servidor
 function enviarAlServidor(datos, endpoint) {
     fetch(`http://localhost:3000/${endpoint}`, {
         method: 'POST',
@@ -67,15 +66,13 @@ function enviarAlServidor(datos, endpoint) {
     });
 }
 
-// Manejar el formulario de registro
 document.getElementById('registroForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const nombre = document.getElementById('nombreRegistro').value;
     const correo = document.getElementById('correoRegistro').value;
     let contraseña = document.getElementById('contraseñaRegistro').value;
-
-    // Validación básica
+ca
     if (!nombre || !correo || !contraseña) {
         document.getElementById('resultado').innerText = 'Todos los campos son obligatorios.';
         return;
@@ -86,32 +83,26 @@ document.getElementById('registroForm').addEventListener('submit', async functio
         return;
     }
 
-    // Hashear la contraseña
     contraseña = await hashPassword(contraseña);
 
     const datos = { nombre, correo, contraseña };
 
-    // Guardar datos en IndexedDB
     guardarEnIndexedDB(datos);
 
-    // Enviar datos al servidor
     enviarAlServidor(datos, 'registro');
 });
 
-// Función para validar el formato del correo
 function validarCorreo(correo) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(correo);
 }
 
-// Manejar el formulario de inicio de sesión
 document.getElementById('inicioForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const correo = document.getElementById('correoInicio').value;
     let contraseña = document.getElementById('contraseñaInicio').value;
 
-    // Validación básica
     if (!correo || !contraseña) {
         document.getElementById('resultado').innerText = 'Todos los campos son obligatorios.';
         return;
@@ -122,16 +113,13 @@ document.getElementById('inicioForm').addEventListener('submit', async function(
         return;
     }
 
-    // Hashear la contraseña
     contraseña = await hashPassword(contraseña);
 
     const datos = { correo, contraseña };
 
-    // Enviar datos al servidor
     enviarAlServidor(datos, 'iniciar_sesion');
 });
 
-// Funciones para cambiar entre los formularios
 function iniciar_sesion() {
     document.getElementById('inicioForm').style.display = 'block';
     document.getElementById('registroForm').style.display = 'none';
