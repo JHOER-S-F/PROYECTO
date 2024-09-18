@@ -1,5 +1,5 @@
+// IndexedDB: Inicialización de la base de datos
 let db;
-
 
 window.onload = function () {
     let request = window.indexedDB.open('miBaseDatos', 1);
@@ -22,7 +22,7 @@ window.onload = function () {
     };
 };
 
-
+// Hashing de la contraseña usando SHA-256
 async function hashPassword(password) {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
@@ -30,7 +30,7 @@ async function hashPassword(password) {
     return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-
+// Guardar datos en IndexedDB
 function guardarEnIndexedDB(datos) {
     let transaction = db.transaction(['usuarios'], 'readwrite');
     let objectStore = transaction.objectStore('usuarios');
@@ -47,6 +47,7 @@ function guardarEnIndexedDB(datos) {
     };
 }
 
+// Enviar datos al servidor
 function enviarAlServidor(datos, endpoint) {
     fetch(`http://localhost:3000/${endpoint}`, {
         method: 'POST',
@@ -66,13 +67,14 @@ function enviarAlServidor(datos, endpoint) {
     });
 }
 
+// Manejo del formulario de registro
 document.getElementById('registroForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const nombre = document.getElementById('nombreRegistro').value;
     const correo = document.getElementById('correoRegistro').value;
     let contraseña = document.getElementById('contraseñaRegistro').value;
-ca
+
     if (!nombre || !correo || !contraseña) {
         document.getElementById('resultado').innerText = 'Todos los campos son obligatorios.';
         return;
@@ -88,15 +90,16 @@ ca
     const datos = { nombre, correo, contraseña };
 
     guardarEnIndexedDB(datos);
-
     enviarAlServidor(datos, 'registro');
 });
 
+// Validación del formato del correo
 function validarCorreo(correo) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(correo);
 }
 
+// Manejo del formulario de inicio de sesión
 document.getElementById('inicioForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -120,6 +123,7 @@ document.getElementById('inicioForm').addEventListener('submit', async function(
     enviarAlServidor(datos, 'iniciar_sesion');
 });
 
+// Funciones para alternar entre registro e inicio de sesión
 function iniciar_sesion() {
     document.getElementById('inicioForm').style.display = 'block';
     document.getElementById('registroForm').style.display = 'none';
@@ -129,3 +133,83 @@ function registro_s() {
     document.getElementById('inicioForm').style.display = 'none';
     document.getElementById('registroForm').style.display = 'block';
 }
+
+// Geolocalización - Ubicación del usuario
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+} else {
+    console.log("La geolocalización no es soportada por este navegador.");
+}
+
+function showPosition(position) {
+    const latitud = position.coords.latitude;
+    const longitud = position.coords.longitude;
+    console.log("Latitud: " + latitud + " Longitud: " + longitud);
+
+    // Aquí podrías actualizar el mapa con la ubicación actual del usuario
+    var userLocation = { lat: latitud, lng: longitud };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: userLocation
+    });
+
+    var marker = new google.maps.Marker({
+        position: userLocation,
+        map: map,
+        title: 'Tu ubicación'
+    });
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            console.log("El usuario denegó la solicitud de geolocalización.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            console.log("La información de ubicación no está disponible.");
+            break;
+        case error.TIMEOUT:
+            console.log("La solicitud para obtener la ubicación ha caducado.");
+            break;
+        case error.UNKNOWN_ERROR:
+            console.log("Un error desconocido ocurrió.");
+            break;
+    }
+}
+
+// FullCalendar - Renderizado del calendario de disponibilidad
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: [
+            {
+                title: 'Cancha 1 Reservada',
+                start: '2024-09-20T18:00:00'
+            },
+            {
+                title: 'Cancha 2 Reservada',
+                start: '2024-09-22T15:00:00'
+            }
+        ]
+    });
+    calendar.render();
+});
+
+// Función para mostrar alertas de confirmación al reservar una cancha
+function confirmarReserva(canchaId) {
+    if (confirm("¿Estás seguro de que quieres reservar esta cancha?")) {
+        // Lógica para procesar la reserva
+        alert("Cancha reservada con éxito.");
+    } else {
+        alert("Reserva cancelada.");
+    }
+}
+
+// Escucha eventos para los botones de reserva
+document.querySelectorAll('.cancha button').forEach(function (button) {
+    button.addEventListener('click', function () {
+        const canchaId = this.parentElement.querySelector('h3').innerText;
+        confirmarReserva(canchaId);
+    });
+});
