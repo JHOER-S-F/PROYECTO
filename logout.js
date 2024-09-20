@@ -12,3 +12,8 @@ const interval = setInterval(() => {
 setTimeout(() => {
     window.location.href = 'index.html';
 }, 10000); // 10000 ms = 10 segundos
+
+document.getElementById('reloginButton').addEventListener('click', () => {
+    window.location.href = 'registro.html'; // Redirige a la página de inicio de sesión
+});
+
