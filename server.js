@@ -1,4 +1,3 @@
-// Importar módulos necesarios
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -6,39 +5,35 @@ const cors = require('cors');
 const { body, validationResult } = require('express-validator');
 const util = require('util');
 const bcrypt = require('bcrypt');
-const fs = require('fs'); // Importar el módulo fs para manejar archivos
-const registroRouter = require('./registro'); // Importar el router de registro
-const perfilRouter = require('./perfil'); // Importar el router de perfil (si lo tienes)
 
-// Crear la aplicación Express
 const app = express();
 const port = 3000;
 
-// Habilitar CORS para permitir solicitudes desde otros dominios
+// Habilitar CORS
 app.use(cors());
 
 // Configurar la conexión a la base de datos
 const connection = mysql.createConnection({
     host: 'localhost',
-    user: 'root', // Cambia esto si tienes un usuario diferente
-    password: '', // Cambia esto si tienes una contraseña
-    database: 'prueba_api' // Nombre de la base de datos
+    user: 'root',
+    password: '',
+    database: 'prueba_api'
 });
 
 // Conectar a la base de datos
 connection.connect((err) => {
-    if (err) throw err; // Lanzar error si no se puede conectar
+    if (err) throw err;
     console.log('Conectado a la base de datos MySQL!');
 });
 
-// Promisificar la consulta de MySQL para facilitar el uso de async/await
+// Promisificar la consulta de MySQL
 const query = util.promisify(connection.query).bind(connection);
 
 // Middleware para parsear el cuerpo de las solicitudes
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // Para manejar JSON
 
-// Middleware de validación de entrada para las reservas
+// Middleware de validación de entrada
 const validarReserva = [
     body('fecha_entrada').isDate().withMessage('Fecha de entrada no válida'),
     body('hora_entrada').matches(/^\d{2}:\d{2}$/).withMessage('Hora de entrada no válida'),
@@ -48,15 +43,14 @@ const validarReserva = [
 
 // Ruta para manejar las reservas
 app.post('/reservar', validarReserva, async (req, res) => {
-    const errores = validationResult(req); // Verificar errores de validación
+    const errores = validationResult(req);
     if (!errores.isEmpty()) {
-        return res.status(400).json({ errores: errores.array() }); // Devolver errores si existen
+        return res.status(400).json({ errores: errores.array() });
     }
 
     const { fecha_entrada, hora_entrada, hora_salida, cancha } = req.body;
 
     try {
-        // Consulta para verificar si la cancha ya está reservada en el horario seleccionado
         const checkQuery = `
             SELECT * FROM reservas 
             WHERE cancha = ? 
@@ -75,7 +69,6 @@ app.post('/reservar', validarReserva, async (req, res) => {
             return res.status(400).json({ error: 'La cancha ya está reservada en el horario seleccionado.' });
         }
 
-        // Insertar la nueva reserva en la base de datos
         const insertQuery = `
             INSERT INTO reservas (fecha_entrada, hora_entrada, hora_salida, cancha) 
             VALUES (?, ?, ?, ?)
@@ -144,18 +137,7 @@ app.post('/login', (req, res) => {
                 }
 
                 if (isMatch) {
-                    // Guardar datos del usuario en un archivo JSON
-                    const userData = {
-                        nombre: user.nombre,
-                        correo: user.correo,
-                        telefono: user.telefono || null,
-                        direccion: user.direccion || null,
-                        fecha_nacimiento: user.fecha_nacimiento || null
-                    };
-
-                    fs.writeFileSync('perfil.json', JSON.stringify(userData, null, 2), 'utf8');
-
-                    res.status(200).json({ message: 'Inicio de sesión exitoso', user: userData });
+                    res.status(200).json({ message: 'Inicio de sesión exitoso' });
                 } else {
                     res.status(401).json({ message: 'Credenciales incorrectas' });
                 }
@@ -166,51 +148,11 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Ruta para guardar reseñas
-app.post('/api/reseñas', (req, res) => {
-    const { cancha_id, usuario_id, calificacion, comentario } = req.body;
-
-    const query = 'INSERT INTO reseñas (cancha_id, usuario_id, calificacion, comentario) VALUES (?, ?, ?, ?)';
-    connection.query(query, [cancha_id, usuario_id, calificacion, comentario], (error, results) => {
-        if (error) {
-            return res.status(500).send('Error al guardar la reseña');
-        }
-        res.status(201).send('Reseña guardada');
-    });
-});
-
-// Endpoint para obtener reseñas
-app.get('/api/reseñas/:cancha_id', (req, res) => {
-    const { cancha_id } = req.params;
-
-    const query = 'SELECT * FROM reseñas WHERE cancha_id = ?';
-    connection.query(query, [cancha_id], (error, results) => {
-        if (error) {
-            return res.status(500).send('Error al obtener las reseñas');
-        }
-        res.json(results);
-    });
-});
-
 // Middleware global para manejar errores
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Algo salió mal. Por favor, intenta más tarde.' });
 });
-
-// Ruta para cerrar sesión
-app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.redirect('/error'); // Redirigir a una página de error si hay un problema
-        }
-        res.redirect('/logout.html'); // Redirigir a logout.html
-    });
-});
-
-// Rutas para el perfil y el registro
-app.use('/api/perfil', perfilRouter); 
-app.use('/api/registro', registroRouter); // Ruta para el registro
 
 // Iniciar el servidor
 app.listen(port, () => {
