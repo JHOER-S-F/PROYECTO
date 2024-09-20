@@ -6,26 +6,22 @@
     <title>Reservas de Canchas de Fútbol</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="reserva.css">
-    <script src="recerva" defer></script>
+    <script src="reserva.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>
-            RESERVAR CANCHA DE FÚTBIL
-        </h1>
+        <h1>RESERVAR CANCHA DE FÚTBOL</h1>
         <form id="reservaForm" action="http://localhost:3000/reservar" method="POST">
-            <!-- El resto de tu formulario sigue igual -->
-                
-            <label for="fecha">FECHA</label>
-            <input type="date" id="fecha_entrada" name="fecha" required>          
+            <label for="fecha_entrada">FECHA</label>
+            <input type="date" id="fecha_entrada" name="fecha_entrada" required>          
             
-            <label for="hora">HORA_ENTRADA</label>
+            <label for="hora_entrada">HORA ENTRADA</label>
             <input type="time" id="hora_entrada" name="hora_entrada" required>
 
-            <label for="hora">HORA SALIDA</label>
+            <label for="hora_salida">HORA SALIDA</label>
             <input type="time" id="hora_salida" name="hora_salida" required>
 
-            <label for="cancha"></label>
+            <label for="cancha">SELECCIONAR CANCHA</label>
             <select id="cancha" name="cancha" class="canchas" required>
                 <option value="1">CANCHA 1</option>
                 <option value="2">CANCHA 2</option>
@@ -39,3 +35,5 @@
     </div>
 </body>
 </html>
+
+

@@ -1,137 +1,218 @@
+// Importar módulos necesarios
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const bcrypt = require('bcrypt'); // Para encriptar contraseñas
+const { body, validationResult } = require('express-validator');
+const util = require('util');
+const bcrypt = require('bcrypt');
+const fs = require('fs'); // Importar el módulo fs para manejar archivos
+const registroRouter = require('./registro'); // Importar el router de registro
+const perfilRouter = require('./perfil'); // Importar el router de perfil (si lo tienes)
 
-// Crear la app de express
+// Crear la aplicación Express
 const app = express();
-const saltRounds = 10; // Para el hashing de contraseñas
+const port = 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Habilitar CORS para permitir solicitudes desde otros dominios
 app.use(cors());
 
-// Conexión a la base de datos
-const db = mysql.createConnection({
+// Configurar la conexión a la base de datos
+const connection = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: '', // Añade tu contraseña si tienes una
-    database: 'prueba_api' // Base de datos utilizada para reservas y usuarios
+    user: 'root', // Cambia esto si tienes un usuario diferente
+    password: '', // Cambia esto si tienes una contraseña
+    database: 'prueba_api' // Nombre de la base de datos
 });
 
 // Conectar a la base de datos
-db.connect((err) => {
-    if (err) {
-        console.log('Error al conectar a MySQL:', err);
-        return;
+connection.connect((err) => {
+    if (err) throw err; // Lanzar error si no se puede conectar
+    console.log('Conectado a la base de datos MySQL!');
+});
+
+// Promisificar la consulta de MySQL para facilitar el uso de async/await
+const query = util.promisify(connection.query).bind(connection);
+
+// Middleware para parsear el cuerpo de las solicitudes
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // Para manejar JSON
+
+// Middleware de validación de entrada para las reservas
+const validarReserva = [
+    body('fecha_entrada').isDate().withMessage('Fecha de entrada no válida'),
+    body('hora_entrada').matches(/^\d{2}:\d{2}$/).withMessage('Hora de entrada no válida'),
+    body('hora_salida').matches(/^\d{2}:\d{2}$/).withMessage('Hora de salida no válida'),
+    body('cancha').isInt({ min: 1 }).withMessage('Selecciona una cancha válida')
+];
+
+// Ruta para manejar las reservas
+app.post('/reservar', validarReserva, async (req, res) => {
+    const errores = validationResult(req); // Verificar errores de validación
+    if (!errores.isEmpty()) {
+        return res.status(400).json({ errores: errores.array() }); // Devolver errores si existen
     }
-    console.log('Conectado a MySQL');
-});
 
-// -------------------- FUNCIONALIDAD DE RESERVAS --------------------
+    const { fecha_entrada, hora_entrada, hora_salida, cancha } = req.body;
 
-// Ruta para realizar una reserva
-app.post('/reservar', (req, res) => {
-    const { fecha, hora_entrada, hora_salida, cancha } = req.body;
+    try {
+        // Consulta para verificar si la cancha ya está reservada en el horario seleccionado
+        const checkQuery = `
+            SELECT * FROM reservas 
+            WHERE cancha = ? 
+            AND fecha_entrada = ? 
+            AND (
+                (hora_entrada < ? AND hora_salida > ?) OR
+                (hora_entrada >= ? AND hora_entrada < ?) OR
+                (hora_salida > ? AND hora_salida <= ?)
+            )
+        `;
+        const checkValues = [cancha, fecha_entrada, hora_salida, hora_entrada, hora_entrada, hora_salida, hora_entrada, hora_salida];
 
-    const sqlVerificar = `
-        SELECT * FROM reservas 
-        WHERE cancha = ? 
-        AND fecha = ? 
-        AND (hora_entrada < ? AND hora_salida > ?)
-    `;
-    
-    db.query(sqlVerificar, [cancha, fecha, hora_salida, hora_entrada], (err, result) => {
-        if (err) {
-            console.error('Error al verificar la reserva:', err);
-            res.status(500).send('Error en el servidor al verificar la reserva.');
-            return;
+        const resultados = await query(checkQuery, checkValues);
+
+        if (resultados.length > 0) {
+            return res.status(400).json({ error: 'La cancha ya está reservada en el horario seleccionado.' });
         }
 
-        if (result.length > 0) {
-            res.status(400).send('La cancha ya está reservada en el rango de tiempo seleccionado.');
-        } else {
-            const sqlInsertar = 'INSERT INTO reservas (fecha, hora_entrada, hora_salida, cancha) VALUES (?, ?, ?, ?)';
-            db.query(sqlInsertar, [fecha, hora_entrada, hora_salida, cancha], (err, result) => {
-                if (err) {
-                    console.error('Error al insertar la reserva:', err);
-                    res.status(500).send('Error en el servidor al insertar la reserva.');
-                    return;
-                }
-                res.status(200).send('Reserva realizada con éxito');
-            });
-        }
-    });
+        // Insertar la nueva reserva en la base de datos
+        const insertQuery = `
+            INSERT INTO reservas (fecha_entrada, hora_entrada, hora_salida, cancha) 
+            VALUES (?, ?, ?, ?)
+        `;
+        const insertValues = [fecha_entrada, hora_entrada, hora_salida, cancha];
+
+        await query(insertQuery, insertValues);
+        res.json({ message: 'Reserva realizada con éxito!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error interno al realizar la reserva' });
+    }
 });
 
-// -------------------- FUNCIONALIDAD DE REGISTRO --------------------
-
-// Ruta para el registro de usuarios
-app.post('/registro', (req, res) => {
+// Ruta para registrar usuario
+app.post('/register', async (req, res) => {
     const { nombre, correo, contraseña } = req.body;
 
-    // Verificar si el correo ya está registrado
-    const sqlVerificar = 'SELECT * FROM users WHERE correo = ?';
-    db.query(sqlVerificar, [correo], (err, result) => {
+    // Verificar si el correo ya existe
+    const checkSql = 'SELECT * FROM users WHERE correo = ?';
+    connection.query(checkSql, [correo], (err, results) => {
         if (err) {
-            res.status(500).send('Error en el servidor');
-            return;
+            console.error('Error al verificar el correo:', err);
+            return res.status(500).json({ error: 'Error en la consulta' });
         }
-        if (result.length > 0) {
-            res.status(400).send('El correo ya está registrado');
-        } else {
-            // Hashear la contraseña antes de guardarla
-            bcrypt.hash(contraseña, saltRounds, (err, hash) => {
+
+        if (results.length > 0) {
+            return res.status(409).json({ message: 'Este correo ya está registrado' });
+        }
+
+        // Hash de la contraseña
+        bcrypt.hash(contraseña, 10, (err, hash) => {
+            if (err) {
+                console.error('Error al hash de la contraseña:', err);
+                return res.status(500).json({ error: 'Error al registrar el usuario' });
+            }
+
+            const sql = 'INSERT INTO users (nombre, correo, contraseña) VALUES (?, ?, ?)';
+            connection.query(sql, [nombre, correo, hash], (err, result) => {
                 if (err) {
-                    res.status(500).send('Error en el servidor');
-                    return;
+                    console.error('Error al registrar el usuario:', err);
+                    return res.status(500).json({ error: 'Error al registrar el usuario' });
                 }
-                // Insertar el nuevo usuario
-                const sqlInsertar = 'INSERT INTO users (nombre, correo, contraseña) VALUES (?, ?, ?)';
-                db.query(sqlInsertar, [nombre, correo, hash], (err, result) => {
-                    if (err) {
-                        res.status(500).send('Error al registrar el usuario');
-                        return;
-                    }
-                    res.status(200).send('Usuario registrado con éxito');
-                });
+                res.status(201).json({ message: 'Usuario registrado con éxito' });
             });
-        }
+        });
     });
 });
 
-// -------------------- FUNCIONALIDAD DE INICIO DE SESIÓN --------------------
-
-// Ruta para el inicio de sesión
-app.post('/iniciar_sesion', (req, res) => {
+// Ruta para iniciar sesión
+app.post('/login', (req, res) => {
     const { correo, contraseña } = req.body;
-
-    // Verificar si el correo existe en la base de datos
-    const sqlBuscar = 'SELECT * FROM users WHERE correo = ?';
-    db.query(sqlBuscar, [correo], (err, result) => {
+    const sql = 'SELECT * FROM users WHERE correo = ?';
+    connection.query(sql, [correo], (err, results) => {
         if (err) {
-            res.status(500).send('Error en el servidor');
-            return;
+            console.error('Error en la consulta:', err);
+            return res.status(500).json({ error: 'Error en la consulta' });
         }
-        if (result.length === 0) {
-            res.status(400).send('El correo no está registrado');
-        } else {
-            // Comparar las contraseñas
-            bcrypt.compare(contraseña, result[0].contraseña, (err, coinciden) => {
-                if (coinciden) {
-                    res.status(200).send('Inicio de sesión exitoso');
+
+        if (results.length > 0) {
+            const user = results[0];
+            bcrypt.compare(contraseña, user.contraseña, (err, isMatch) => {
+                if (err) {
+                    console.error('Error al comparar contraseñas:', err);
+                    return res.status(500).json({ error: 'Error al iniciar sesión' });
+                }
+
+                if (isMatch) {
+                    // Guardar datos del usuario en un archivo JSON
+                    const userData = {
+                        nombre: user.nombre,
+                        correo: user.correo,
+                        telefono: user.telefono || null,
+                        direccion: user.direccion || null,
+                        fecha_nacimiento: user.fecha_nacimiento || null
+                    };
+
+                    fs.writeFileSync('perfil.json', JSON.stringify(userData, null, 2), 'utf8');
+
+                    res.status(200).json({ message: 'Inicio de sesión exitoso', user: userData });
                 } else {
-                    res.status(400).send('Contraseña incorrecta');
+                    res.status(401).json({ message: 'Credenciales incorrectas' });
                 }
             });
+        } else {
+            res.status(401).json({ message: 'Credenciales incorrectas' });
         }
     });
 });
 
-// -------------------- INICIAR SERVIDOR --------------------
-app.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+// Ruta para guardar reseñas
+app.post('/api/reseñas', (req, res) => {
+    const { cancha_id, usuario_id, calificacion, comentario } = req.body;
+
+    const query = 'INSERT INTO reseñas (cancha_id, usuario_id, calificacion, comentario) VALUES (?, ?, ?, ?)';
+    connection.query(query, [cancha_id, usuario_id, calificacion, comentario], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al guardar la reseña');
+        }
+        res.status(201).send('Reseña guardada');
+    });
 });
 
+// Endpoint para obtener reseñas
+app.get('/api/reseñas/:cancha_id', (req, res) => {
+    const { cancha_id } = req.params;
+
+    const query = 'SELECT * FROM reseñas WHERE cancha_id = ?';
+    connection.query(query, [cancha_id], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al obtener las reseñas');
+        }
+        res.json(results);
+    });
+});
+
+// Middleware global para manejar errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Algo salió mal. Por favor, intenta más tarde.' });
+});
+
+// Ruta para cerrar sesión
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.redirect('/error'); // Redirigir a una página de error si hay un problema
+        }
+        res.redirect('/logout.html'); // Redirigir a logout.html
+    });
+});
+
+// Rutas para el perfil y el registro
+app.use('/api/perfil', perfilRouter); 
+app.use('/api/registro', registroRouter); // Ruta para el registro
+
+// Iniciar el servidor
+app.listen(port, () => {
+    console.log(`Servidor corriendo en http://localhost:${port}`);
+});

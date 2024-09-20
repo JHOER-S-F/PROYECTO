@@ -1,11 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ususario</title>
+    <title>Reservas de Canchas de Fútbol</title>
+    <link rel="stylesheet" href="usuario.css"> <!-- Vincula tu archivo CSS -->
+    <script src="usuario.js" defer></script> <!-- Vincula tu archivo JavaScript -->
 </head>
 <body>
-    
+    <!-- Encabezado -->
+    <header>
+        <nav>
+            <a href="index.html"><img src="logo.png" alt="Logo del Sitio"></a>
+            <ul>
+                <li><a href="reserva.html">RESERVAR CANCHAS</a></li>
+                <li><a href="mis_reservas.html">MIS RECERVAS</a></li>
+                <li><a href="perfil.html">PERFIL</a></li>
+                <li><a href="logout.html">CERRAR SECCIÓN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Sección de búsqueda de canchas -->
+    <section>
+        <h2>Buscar Cancha Disponible</h2>
+        <form action="buscar_canchas.html" method="GET">
+            <label for="ubicacion">Ubicación:</label>
+            <input type="text" id="ubicacion" name="ubicacion" placeholder="Ciudad o área">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha">
+            <label for="hora">Hora:</label>
+            <input type="time" id="hora" name="hora">
+            <label for="tipo">Tipo de Cancha:</label>
+            <select id="tipo" name="tipo">
+                <option value="futbol5">Fútbol 5</option>
+                <option value="futbol7">Fútbol 7</option>
+                <option value="futbol11">Fútbol 11</option>
+            </select>
+            <button type="submit">Buscar</button>
+        </form>
+    </section>
+
+    <!-- Mapa interactivo -->
+    <section>
+        <h2>Ubicación de las Canchas Disponibles</h2>
+        <div id="map"></div>
+    </section>
+
+    <!-- Calendario interactivo -->
+    <section>
+        <h2>Calendario de Disponibilidad</h2>
+        <div id="calendar"></div>
+    </section>
+
+    <!-- Sección de resultados de búsqueda -->
+    <section>
+        <h2>Canchas Disponibles</h2>
+        <div class="cancha" id="cancha1">
+            <h3>Cancha 1 - Fútbol 5</h3>
+            <p>Ubicación: Centro Deportivo XYZ</p>
+            <p>Precio: $50/hora</p>
+            <button onclick="reservarCancha(1)">Reservar</button>
+        </div>
+        <div class="cancha" id="cancha2">
+            <h3>Cancha 2 - Fútbol 7</h3>
+            <p>Ubicación: Polideportivo ABC</p>
+            <p>Precio: $70/hora</p>
+            <button onclick="reservarCancha(2)">Reservar</button>
+        </div>
+    </section>
+
+    <!-- Sección de reseñas y calificaciones -->
+    <section>
+        <h2>Reseñas y Calificaciones</h2>
+        <div class="resena" id="reseñasCancha1">
+            <h3>Cancha 1 - Fútbol 5</h3>
+            <p>Calificación: <span id="calificacionPromedio1"></span>/5</p>
+            <textarea id="comentarioCancha1" placeholder="Escribe tu reseña"></textarea>
+            <button onclick="enviarResena(1, 'usuario_id')">Enviar Reseña</button>
+            <div id="listaResenasCancha1"></div>
+        </div>
+        <div class="resena" id="reseñasCancha2">
+            <h3>Cancha 2 - Fútbol 7</h3>
+            <p>Calificación: <span id="calificacionPromedio2"></span>/5</p>
+            <textarea id="comentarioCancha2" placeholder="Escribe tu reseña"></textarea>
+            <button onclick="enviarResena(2, 'usuario_id')">Enviar Reseña</button>
+            <div id="listaResenasCancha2"></div>
+        </div>
+    </section>
+
+    <!-- Sección de mis reservas -->
+    <section>
+        <h2>Mis Reservas</h2>
+        <div class="reserva">
+            <h3>Reserva: Cancha 1</h3>
+            <p>Fecha: 20/09/2024</p>
+            <p>Hora: 18:00</p>
+            <p>Ubicación: Centro Deportivo XYZ</p>
+            <button>Cancelar Reserva</button>
+        </div>
+    </section>
+
+    <!-- Sección de perfil de usuario -->
+    <section>
+        <h2>Perfil de Usuario</h2>
+        <form action="actualizar_perfil.html" method="POST">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="Usuario Ejemplo">
+            <label for="email">Correo electrónico:</label>
+            <input type="email" id="email" name="email" value="usuario@ejemplo.com">
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" value="1234567890">
+            <button type="submit">Actualizar Datos</button>
+        </form>
+    </section>
+
+    <!-- Sección de pago en línea -->
+    <section>
+        <h2>Realizar Pago de Reserva</h2>
+        <form action="/procesar_pago" method="POST">
+            <label for="numero_tarjeta">Número de Tarjeta:</label>
+            <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="1234 5678 9101 1121">
+            <label for="expiracion">Fecha de Expiración:</label>
+            <input type="text" id="expiracion" name="expiracion" placeholder="MM/AA">
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123">
+            <button type="submit">Pagar</button>
+        </form>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>&copy; 2024 Reservas de Canchas Fútbol. Todos los derechos reservados.</p>
+        <ul>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="terminos.html">Términos y Condiciones</a></li>
+            <li><a href="https://facebook.com">Facebook</a></li>
+            <li><a href="https://instagram.com">Instagram</a></li>
+        </ul>
+    </footer>
+
+    <!-- Vincula los scripts -->
+    <script src="app.js"></script> <!-- Tu archivo JavaScript -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script> <!-- Calendario -->
 </body>
 </html>

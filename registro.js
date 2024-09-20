@@ -1,179 +1,101 @@
-var registros = document.querySelector(".caja_registros");
-var inicio = document.querySelector(".inicio");
-var registro = document.querySelector(".registro");
-var caja_sesion = document.querySelector(".caja_sesion");
-var caja_registro = document.querySelector(".caja_registro");
+var registros, inicio, registro, caja_sesion, caja_registro;
 
-window.addEventListener("resize", anchopagina);
+window.onload = function() {
+    registros = document.querySelector(".caja_registros");
+    inicio = document.querySelector(".inicio");
+    registro = document.querySelector(".registro");
+    caja_sesion = document.querySelector(".caja_sesion");
+    caja_registro = document.querySelector(".caja_registro");
 
-function anchopagina() {
+    window.addEventListener("resize", ajustarVistaSegunAncho);
+    ajustarVistaSegunAncho();
+};
+
+function ajustarVistaSegunAncho() {
     if (window.innerWidth > 850) {
         caja_registro.style.display = "block";
         caja_sesion.style.display = "block";
     } else {
         caja_registro.style.display = "block";
-        caja_registro.style.opacity = "1";
         caja_sesion.style.display = "none";
         inicio.style.display = "block";
         registro.style.display = "none";
         registros.style.left = "0px";
     }
-}
-
-anchopagina();
+};
 
 function iniciar_sesion() {
-    if (window.innerWidth > 850) {
-        inicio.style.display = "block";
-        registro.style.display = "none";
-        registros.style.left = "10px";
-        caja_registro.style.opacity = "1";
-        caja_sesion.style.opacity = "0";
-    } else {
-        inicio.style.display = "block";
-        registro.style.display = "none";
-        caja_registro.style.display = "block";
-        caja_sesion.style.display = "none";
-        registros.style.left = "0px";
+    inicio.style.display = "block";
+    registro.style.display = "none";
+    registros.style.left = window.innerWidth > 850 ? "10px" : "0px";
+    caja_registro.style.opacity = "1";
+    caja_sesion.style.opacity = "0";
+};
+
+function registrar() {
+    registros.style.left = window.innerWidth > 850 ? "410px" : "0px";
+    registro.style.display = "block";
+    inicio.style.display = "none";
+    caja_registro.style.opacity = "0";
+    caja_sesion.style.opacity = "1";
+};
+
+async function iniciarSesion(event) {
+    event.preventDefault();
+    
+    const correo = document.getElementById('correoInicio').value;
+    const contraseña = document.getElementById('contraseñaInicio').value;
+
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ correo, contraseña })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message);
+            // Redirigir a usuario.html después de un inicio de sesión exitoso
+            window.location.href = 'usuario.html';
+        } else {
+            alert(data.message || 'Error al iniciar sesión');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al comunicarse con el servidor');
     }
-}
+};
 
-function registro_s() {
-    if (window.innerWidth > 850) {
-        registros.style.left = "410px";
-        registro.style.display = "block";
-        inicio.style.display = "none";
-        caja_registro.style.opacity = "0";
-        caja_sesion.style.opacity = "1";
-    } else {
-        registro.style.display = "block";
-        inicio.style.display = "none";
-        caja_registro.style.display = "none";
-        caja_sesion.style.display = "block";
-        caja_sesion.style.opacity = "1";
-    }
-}
-
-// Función para hashear la contraseña usando SHA-256
-async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Validación del correo
-function validarCorreo(correo) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(correo);
-}
-
-// Función para mostrar mensajes de error
-function mostrarError(mensaje) {
-    const resultado = document.getElementById('resultado');
-    resultado.innerText = mensaje;
-    resultado.style.color = 'red';
-}
-
-// Función para mostrar mensajes de éxito
-function mostrarExito(mensaje) {
-    const resultado = document.getElementById('resultado');
-    resultado.innerText = mensaje;
-    resultado.style.color = 'green';
-}
-
-// Manejar el formulario de registro
-document.getElementById('registroForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
+async function registrarUsuario(event) {
+    event.preventDefault();
+    
     const nombre = document.getElementById('nombreRegistro').value;
     const correo = document.getElementById('correoRegistro').value;
-    let contraseña = document.getElementById('contraseñaRegistro').value;
+    const contraseña = document.getElementById('contraseñaRegistro').value;
 
-    // Validación básica
-    if (!nombre || !correo || !contraseña) {
-        mostrarError('Todos los campos son obligatorios.');
-        return;
+    try {
+        const response = await fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nombre, correo, contraseña })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message);
+            // Puedes redirigir o limpiar el formulario aquí
+        } else {
+            alert(data.message || 'Error al registrarse');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al comunicarse con el servidor');
     }
-
-    if (!validarCorreo(correo)) {
-        mostrarError('El formato del correo es inválido.');
-        return;
-    }
-
-    // Hashear la contraseña
-    contraseña = await hashPassword(contraseña);
-
-    const datos = { nombre, correo, contraseña };
-
-    // Enviar datos al servidor
-    fetch('http://localhost:3000/registro', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.text())
-    .then(data => {
-        mostrarExito(data);
-    })
-    .catch(error => {
-        mostrarError('Error al enviar los datos al servidor: ' + error.message);
-    });
-});
-
-// Manejar el formulario de inicio de sesión
-document.getElementById('inicioForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const correo = document.getElementById('correoInicio').value;
-    let contraseña = document.getElementById('contraseñaInicio').value;
-
-    // Validación básica
-    if (!correo || !contraseña) {
-        mostrarError('Todos los campos son obligatorios.');
-        return;
-    }
-
-    if (!validarCorreo(correo)) {
-        mostrarError('El formato del correo es inválido.');
-        return;
-    }
-
-    // Hashear la contraseña
-    contraseña = await hashPassword(contraseña);
-
-    const datos = { correo, contraseña };
-
-    // Enviar datos al servidor
-    fetch('http://localhost:3000/iniciar_sesion', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.text())
-    .then(data => {
-        mostrarExito(data);
-    })
-    .catch(error => {
-        mostrarError('Error al enviar los datos al servidor: ' + error.message);
-    });
-});
-
-// Transiciones entre formularios
-function iniciar_sesion() {
-    document.getElementById('inicioForm').style.display = 'block';
-    document.getElementById('registroForm').style.display = 'none';
-    registros.style.transition = 'left 0.5s ease';
-}
-
-function registro_s() {
-    document.getElementById('inicioForm').style.display = 'none';
-    document.getElementById('registroForm').style.display = 'block';
-    registros.style.transition = 'left 0.5s ease';
-}
+};
 
 

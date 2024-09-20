@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro e Inicio de Sesión</title>
     <link rel="stylesheet" href="registro.css">
-    <script src="app.js" defer></script>
     <script src="registro.js" defer></script>
 </head>
 <body>
@@ -18,12 +17,12 @@
                 </div>
                 <div class="caja_registro">
                     <h2>¿AÚN NO TIENES UNA CUENTA?</h2>
-                    <input type="button" value="REGISTRARSE" onclick="registro_s()">
+                    <input type="button" value="REGISTRARSE" onclick="registrar()">
                 </div>
             </div>
             <div class="caja_registros">
                 <!-- Formulario de Iniciar Sesión -->
-                <form id="inicioForm" class="inicio">
+                <form id="inicioForm" class="inicio" onsubmit="iniciarSesion(event)">
                     <h2>INICIAR SESIÓN</h2>
                     <input type="email" id="correoInicio" name="correo" placeholder="CORREO ELECTRÓNICO" required>
                     <input type="password" id="contraseñaInicio" name="contraseña" placeholder="CONTRASEÑA" required>
@@ -31,7 +30,7 @@
                 </form>
 
                 <!-- Formulario de Registro -->
-                <form id="registroForm" class="registro">
+                <form id="registroForm" class="registro" onsubmit="registrarUsuario(event)">
                     <h2>REGISTRARSE</h2>
                     <input type="text" id="nombreRegistro" name="nombre" placeholder="NOMBRE" required>
                     <input type="email" id="correoRegistro" name="correo" placeholder="CORREO ELECTRÓNICO" required>
@@ -41,7 +40,6 @@
             </div>
         </div><br><br><br>
         <div id="resultado"></div>
-         <!-- Mostrar resultado del registro/inicio -->
     </main>
 </body>
 </html>

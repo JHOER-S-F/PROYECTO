@@ -141,3 +141,102 @@ function registro_s() {
     document.getElementById('inicioForm').style.display = 'none';
     document.getElementById('registroForm').style.display = 'block';
 }
+
+
+
+
+
+// Geolocalización - Ubicación del usuario
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+} else {
+    console.log("La geolocalización no es soportada por este navegador.");
+}
+
+function showPosition(position) {
+    const latitud = position.coords.latitude;
+    const longitud = position.coords.longitude;
+    console.log("Latitud: " + latitud + " Longitud: " + longitud);
+
+    // Aquí podrías actualizar el mapa con la ubicación actual del usuario
+    var userLocation = { lat: latitud, lng: longitud };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: userLocation
+    });
+
+    var marker = new google.maps.Marker({
+        position: userLocation,
+        map: map,
+        title: 'Tu ubicación'
+    });
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            console.log("El usuario denegó la solicitud de geolocalización.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            console.log("La información de ubicación no está disponible.");
+            break;
+        case error.TIMEOUT:
+            console.log("La solicitud para obtener la ubicación ha caducado.");
+            break;
+        case error.UNKNOWN_ERROR:
+            console.log("Un error desconocido ocurrió.");
+            break;
+    }
+}
+
+// FullCalendar - Renderizado del calendario de disponibilidad
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: [
+            {
+                title: 'Cancha 1 Reservada',
+                start: '2024-09-20T18:00:00'
+            },
+            {
+                title: 'Cancha 2 Reservada',
+                start: '2024-09-22T15:00:00'
+            }
+        ]
+    });
+    calendar.render();
+});
+
+// Función para mostrar alertas de confirmación al reservar una cancha
+function confirmarReserva(canchaId) {
+    if (confirm("¿Estás seguro de que quieres reservar esta cancha?")) {
+        // Lógica para procesar la reserva, como enviar una petición al servidor
+        alert("Cancha reservada con éxito.");
+    } else {
+        alert("Reserva cancelada.");
+    }
+}
+
+// Escucha eventos para los botones de reserva
+document.querySelectorAll('.cancha button').forEach(function (button) {
+    button.addEventListener('click', function () {
+        const canchaId = this.parentElement.querySelector('h3').innerText;
+        confirmarReserva(canchaId);
+    });
+});
+
+// Validación del formulario de pago
+document.querySelector('form[action="/procesar_pago"]').addEventListener('submit', function (event) {
+    const numeroTarjeta = document.getElementById('numero_tarjeta').value;
+    const expiracion = document.getElementById('expiracion').value;
+    const cvv = document.getElementById('cvv').value;
+
+    if (!numeroTarjeta || !expiracion || !cvv) {
+        alert("Por favor, completa todos los campos de pago.");
+        event.preventDefault();
+    } else {
+        alert("Pago procesado correctamente.");
+    }
+});
+
