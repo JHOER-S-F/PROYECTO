@@ -1,3 +1,54 @@
+document.addEventListener("DOMContentLoaded", function() {
+  // Selecciona todos los elementos que tienen el atributo data-animate
+  const elementsToAnimate = document.querySelectorAll('[data-animate]');
+
+  // Crea un observador de intersección para detectar elementos en la vista
+  const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+          // Si el elemento está en la vista, se añade la clase 'visible'
+          if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+          }
+      });
+  }, { threshold: 0.1 }); // Umbral de 10% para activar la animación
+
+  // Observa cada elemento que se va a animar
+  elementsToAnimate.forEach(element => {
+      observer.observe(element);
+  });
+});
+
+// Función para manejar la rotación de testimonios
+document.addEventListener("DOMContentLoaded", function() {
+  // Selecciona todos los elementos con la clase 'testimonial'
+  const testimonials = document.querySelectorAll('.testimonial');
+  let currentIndex = 0; // Índice del testimonio actual
+
+  // Función para cambiar el testimonio visible
+  function showNextTestimonial() {
+      // Elimina la clase 'visible' del testimonio actual
+      testimonials[currentIndex].classList.remove('visible');
+      
+      // Calcula el siguiente índice (circular)
+      currentIndex = (currentIndex + 1) % testimonials.length;
+      
+      // Añade la clase 'visible' al siguiente testimonio
+      testimonials[currentIndex].classList.add('visible');
+  }
+
+  // Cambia el testimonio cada 5 segundos
+  setInterval(showNextTestimonial, 5000);
+  
+  // Inicialmente mostrar el primer testimonio
+  testimonials[currentIndex].classList.add('visible');
+});
+
+
+
+
+
+
+
 const express = require('express');
 const connection = require('./db'); // Importa la conexión a MySQL
 
