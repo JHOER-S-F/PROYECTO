@@ -1,32 +1,57 @@
 /* Estilos globales */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
 }
 
+h2{
+    font-family: 'Concert One', sans-serif;
+    color: #35682d;
+}
 /* Encabezado */
-header {
-    background-color: #333;
-    padding: 10px 0;
-    color: white;
-    text-align: center;
+nav {
+    background-color: #E7F5D9;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
 }
 
-header nav ul {
+nav a {
+    color: #1A4314;
+    padding: 10px;
+    text-decoration: none;
+}
+
+h1 a {
+    font-family: 'Abril Fatface', sans-serif;
+    font-size: 180%;
+    color: #719F1E;
+}
+
+nav ul {
     list-style: none;
     padding: 0;
 }
 
-header nav ul li {
+nav ul li {
     display: inline;
     margin-right: 20px;
 }
 
-header nav ul li a {
-    color: white;
+li a {
+    font-size: 20px;
+    font-family: 'Agdasima', sans-serif;
+    padding: 5px;
+    color: #1A4314;
     text-decoration: none;
+}
+
+li a:hover {
+    color: #719F1E;
 }
 
 /* Secciones */
@@ -37,10 +62,9 @@ section {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 /* Botones */
 button {
-    background-color: #333;
+    background-color: #013A20;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -48,30 +72,32 @@ button {
 }
 
 button:hover {
-    background-color: #555;
+    background-color: #478C5C;
 }
 
 /* Formulario */
 form label {
     display: block;
-    margin: 10px 0 5px;
+    margin: 10px;
 }
 
 form input, form select, form textarea {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    font-size: 18px;
 }
 
 /* Pie de página */
 footer {
-    background-color: #333;
+    background-color: #013A20;
     color: white;
     text-align: center;
     padding: 20px 0;
     margin-top: 30px;
+    height: 70px;
 }
 
 footer ul {
