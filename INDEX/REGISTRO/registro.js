@@ -59,7 +59,7 @@ async function iniciarSesion(event) {
         if (response.ok) {
             alert(data.message);
             // Redirigir a usuario.html después de un inicio de sesión exitoso
-            window.location.href = 'usuario.html';
+            window.location.href = '/USUARIO/usuario.html';
         } else {
             alert(data.message || 'Error al iniciar sesión');
         }

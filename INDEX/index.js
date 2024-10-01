@@ -44,13 +44,34 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
+// Alternar el menú al hacer clic en la imagen o el ícono
+const toggleMenu = () => {
+  const menu = document.getElementById('menuItems');
+  menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+};
+
+document.getElementById('menuIcon').addEventListener('click', function(e) {
+  e.preventDefault();
+  toggleMenu();
+});
+
+document.getElementById('menuIconImg').addEventListener('click', function() {
+  toggleMenu();
+});
+
+
+
+
+
+
+
 
 
 
 
 
 const express = require('express');
-const connection = require('./db'); // Importa la conexión a MySQL
+const connection = require('../db'); // Importa la conexión a MySQL
 
 const app = express();
 const port = process.env.PORT || 3000;

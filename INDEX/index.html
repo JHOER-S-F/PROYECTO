@@ -7,32 +7,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Agdasima:wght@400;700&family=Concert+One&family=Poppins&family=Rajdhani&display=swap" rel="stylesheet">
     <script src="index.js" defer></script>
     <title>SoccerBook</title>
+    <link rel="icon" href="/images/soccer_player_icon_125840.ico">
 </head>
 <body>
     <!-- Menú de navegación -->
     <nav>
         <h1><a href="index.html">SoccerBook</a></h1>
-        <ul>
-            <li>
+        
+            <nav>
                 <label for="search">
                     <img src="/images/lupa.png" alt="lupa">
                     <b>Buscar</b>
                 </label>
                 <input type="text" id="search">
-            </li>
+            </nav>
+            <ul>
             <li><a href="index.html">INICIO</a></li>
-            <li><a href="registro.html">RESERVAS</a></li>
+            <li><a href="REGISTRO/registro.html">RESERVAS</a></li>
             <li><a href="#">CONTACTO</a></li>
-            <li><a href="registro.html" class="sesion">INICIAR SESIÓN</a></li>
-            <li><a href="#" class="menu">=</a></li>
-        </ul>
+            <li><a href="REGISTRO/registro.html" class="sesion">INICIAR SESIÓN</a></li>
+            </ul>
+            <nav>
+                <ul>
+                    <li><img src="/images/Menu.ico" alt="me" id="menuIconImg" ></li> <!-- Imagen de menú -->
+                    <li><a class="menu" id="menuIcon"><i class="fas fa-bars"></i></a></li> <!-- Ícono del menú -->
+                </ul>   
+            </nav>
+            
+            <ul id="menuItems" > <!-- Menú desplegable -->
+                <li><a href="#">INICIO</a></li>
+                <li><a href="#">A</a></li>
+                <li><a href="#">CONTATACTO</a></li>
+            </ul>
+        
     </nav>
 
     <!-- Sección Principal (Hero) -->
     <section class="hero">
         <h2>Bienvenidos a SoccerBook</h2>
         <p>Reserva tu cancha favorita en minutos</p>
-        <a href="registro.html" class="btn">Reserva Ahora</a>
+        <a href="REGISTRO/registro.html" class="btn">Reserva Ahora</a>
     </section>
 
     <!-- Sección de Características -->
@@ -74,7 +88,7 @@
     <!-- Llamada a la Acción (CTA) -->
     <section class="cta">
         <h2>¿Listo para jugar?</h2> <br>
-        <a href="registro.html" class="btn">Regístrate Ahora</a>
+        <a href="REGISTRO/registro.html" class="btn">Regístrate Ahora</a>
     </section>
 
     <!-- Pie de Página -->
@@ -83,9 +97,9 @@
             <p>&copy; 2024 SoccerBook. Todos los derechos reservados.</p>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
-                <li><a href="registro.html">Reservas</a></li>
+                <li><a href="/INDEX/REGISTRO/registro.html">Reservas</a></li>
                 <li><a href="#">Contacto</a></li>
-                <li><a href="registro.html">Iniciar Sesión</a></li>
+                <li><a href="REGISTRO/registro.html">Iniciar Sesión</a></li>
             </ul>
         </div>
     </footer>
